@@ -6,7 +6,7 @@
 #    By: vicalons <vicalons@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/15 13:28:43 by vicalons          #+#    #+#              #
-#    Updated: 2024/11/15 13:45:54 by vicalons         ###   ########.fr        #
+#    Updated: 2024/11/20 10:34:03 by vicalons         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,29 +16,31 @@ CC		= cc
 CFLAGS		= -Wall -Werror -Wextra
 RM		= rm -f
 AR		= ar -rcs
-CP		= cp
-LIB_PATH 	= ./libft
-LIBFT		= $(LIB_PATH)/libft.a
 
-HEADER	= ft_printf.h
-SRC	= ft_printf.c
-OBJ 	= $(SRC: .c=.o)
+SUBDIR		= libft
 
-all: $(LIBFT) $(NAME)
+HEADER		= ft_printf.h
+SRC_FILES	= ft_printf.c \
+		  printf_utils.c
+OBJ_FILES	= $(SRC_FILES:.c=.o)
 
-$(NAME): $(OBJ)
-	$(CP) libft/libft.a $(NAME)
-	$(AR) $(NAME) $(OBJ)
+# Contruir el ejecutable y la libreria estatica
+all: $(NAME)
 
-%.o: %.c $(HEADER)
-	$(CC) -c $(CFLAGS) -I ./ $< -o $@
+# Compila los archivos del directorio actual y enlazar con el subdirectorio
+$(NAME): $(OBJ_FILES)
+	@$(MAKE) -C $(SUBDIR)
+	@$(AR) $(NAME) $(OBJ_FILES) $(SUBDIR)/*.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJ)
-	make -C $(LIB_PATH) clean
+	@$(MAKE) -C $(SUBDIR) clean
+	$(RM) $(OBJ_FILES)
 
 fclean: clean
-	make -C $(LIB_PATH) fclean
+	@$(MAKE) -C $(SUBDIR) fclean
 	$(RM) $(NAME)
 
 re: fclean all
